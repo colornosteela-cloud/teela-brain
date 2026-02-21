@@ -1,9 +1,4 @@
-~/.openclaw/workspace/brain/
-├── nervous_system/
-│   ├── kernel.py              ← updated (5 services)
-│   └── services/
-│       ├── vjepa2_service.py  ← new
-│       ├── sam2_service.py    ← new
-│       ├── motor_service.py   ← existing
-│       └── camera_service_mock.py
-└── teela_live_brain.py        ← updated (sidecars + conversation)
+V-JEPA2 + SAM2 as kernel-managed services — The kernel now tracks 5 services (camera, motor, cortex, vjepa2, sam2). V-JEPA2/SAM2 have a 30s timeout (they need time to load models) and critical: False so they don't block the brain if they fail. Kernel auto-restarts them on crash.
+SidecarListener — New component in the brain subscribes to the kernel's PUB socket and collects the latest V-JEPA2 predictions and SAM2 segmentation data. This gets injected into the VLM prompt so qwen3.5 knows what action is happening (V-JEPA2) and where objects are (SAM2) before deciding.
+ConversationEngine — Runs in its own thread, completely independent from the perception-action loop. You can talk to TEELA via the web dashboard chat box or OpenClaw while the brain keeps running. The conversation has scene awareness — TEELA knows what it currently sees when answering you.
+Enriched VLM prompt — The frontal lobe now tells qwen3.5: "V-JEPA2 predicts action: 'pushing something' (confidence: 0.87). SAM2 detected 5 objects: large object at center, small object at left..." — this gives the cloud model dramatically better situational awareness.
